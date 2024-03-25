@@ -1,25 +1,37 @@
-// Home.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 function Home() {
-    const [data, setData] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:5000/students')
-            .then((res) => {
-                setData(res.data);
+            .then((response) => {
+                setStudents(response.data);
+                setLoading(false);
             })
-            .catch((err) => console.log(err));
+            .catch((error) => {
+                setError(error.message);
+                setLoading(false);
+            });
     }, []);
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
     return (
-        <div className='container-fluid'>
-            <h2>Student List</h2>
-            <table>
-                <thead>
+        <div className='container mt-4'>
+            <h2 className='mb-4'>Student List</h2>
+            <table className='table table-bordered'>
+                <thead className='thead-dark'>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Age</th>
@@ -27,9 +39,8 @@ function Home() {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((student) => (
+                    {students.map((student) => (
                         <tr key={student.id}>
-                            <td>{student.id}</td>
                             <td>{student.name}</td>
                             <td>{student.email}</td>
                             <td>{student.age}</td>
